@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0",
+  "content_type_gate": {
+    "signals_total": 6,
+    "judgment_threshold": 4,
+    "hard_signals": ["argument_role", "failure_mode"],
+    "hard_signal_override": true,
+    "undetermined_default": "answer",
+    "undetermined_marker": true,
+    "mixed_content_strategy": "split_by_judgment_unit",
+    "never_split_by": "whole_book"
+  },
+  "boundary_layers": {
+    "L1_trigger": true,
+    "L2_precheck": true,
+    "L3_output_label": true,
+    "L4_counter_example": true,
+    "L5_writeback": true,
+    "min_counter_examples": 1,
+    "require_degradation_branch": true,
+    "unknown_value": "unknown"
+  },
+  "interrogator": {
+    "questions_min": 3,
+    "questions_max": 5,
+    "no_answer_before_user_reply": true,
+    "fallback_on_unknown": "minimal_hint",
+    "forbid_conclusion_phrasing": ["你应该", "正确答案是", "结论是"],
+    "completion_criterion": "user_states_own_assumption"
+  },
+  "upstream": {
+    "name": "cangjie-skill",
+    "version": "2.5.0",
+    "compiler_interrogator_support": false,
+    "output_modes_supported": ["single", "pack"],
+    "interrogator_compile": "manual_from_template",
+    "generated_dir_writable": false,
+    "verify_variant": "askability"
+  }
+}

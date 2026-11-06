@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.pyo
+.idea/
+.vscode/
+boundary-misses.md
+books/*/DIGEST-JUDGMENT.md

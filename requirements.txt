@@ -1,0 +1,11 @@
+# 判断力补充包本身不含可执行代码，仅 Markdown / JSON 模板 / 配置，零第三方依赖。
+#
+# 上游 upstream/cangjie-core/scripts 的确定性编译器另需：
+#   PyYAML >= 6.0          必需
+#   tiktoken, jsonschema   可选（缺失不影响七阶段主流程）
+#
+# 本机已验证的解释器（系统 PATH 上的 python 未安装 PyYAML，务必用这个）：
+#   C:/Users/alisa/.workbuddy/binaries/python/envs/default/Scripts/python.exe
+#   Python 3.13.14 / PyYAML 6.0.3 / cangjie.py doctor PASS
+#
+# 详见 UPSTREAM.md 第 5 节。

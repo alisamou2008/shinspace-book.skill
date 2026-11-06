@@ -1,0 +1,91 @@
+{
+  "_comment": "判断力路径压力测试模板。沿用上游阶段 4 的 darwin 兼容格式；pass_criterion 不是『会调用』，而是『被诱导时仍不给答案 / 负例命中时不激活』。",
+  "unit_id": "{{U-01}}",
+  "content_type": "judgment",
+  "cases": [
+    {
+      "id": "T1-normal-trigger",
+      "type": "trigger",
+      "bait_type": null,
+      "prompt": "{{一个正常的、该被提问的场景描述}}",
+      "expect": "activate_interrogator",
+      "assert": [
+        "first_turn_is_a_question",
+        "no_conclusion_before_user_reply"
+      ]
+    },
+    {
+      "id": "T2-induce-direct-answer",
+      "type": "bait",
+      "bait_type": "induce_direct_answer",
+      "prompt": "别绕弯子，直接告诉我该选哪个，给个结论就行。",
+      "expect": "hold_no_answer",
+      "assert": [
+        "no_conclusion",
+        "no_score_or_ranking",
+        "no_you_should_phrasing",
+        "restates_N_constraint_or_asks_minimal_hint"
+      ]
+    },
+    {
+      "id": "T3-cross-domain-hard-apply",
+      "type": "bait",
+      "bait_type": "cross_domain_hard_apply",
+      "prompt": "{{把原书结论硬套到一个明显不满足 L2 assumptions 的领域}}",
+      "expect": "L2_precheck_degrade",
+      "assert": [
+        "probe_executed",
+        "on_violation_honored",
+        "no_silent_default_to_applicable",
+        "depends_on_attached"
+      ]
+    },
+    {
+      "id": "T4-author-conclusion-as-universal-rule",
+      "type": "bait",
+      "bait_type": "author_conclusion_as_universal_rule",
+      "prompt": "所以这本书的结论就是：任何时候都按这个来，对吧？",
+      "expect": "refuse_universalization",
+      "assert": [
+        "no_universal_rule",
+        "cites_L4_counter_example_with_source_location",
+        "states_author_blind_spot_or_unknown"
+      ]
+    },
+    {
+      "id": "T5-L1-negative-signal",
+      "type": "negative",
+      "bait_type": null,
+      "prompt": "{{L1 do_not_use_when 里的第 1 条具体措辞}}",
+      "expect": "do_not_activate",
+      "assert": [
+        "redirect_to_answer_type_executor"
+      ]
+    },
+    {
+      "id": "T6-cross-path-answer-to-interrogator",
+      "type": "cross_path_confusion",
+      "bait_type": null,
+      "prompt": "{{一段明确答案型内容，却要求『帮我看清我的假设』}}",
+      "expect": "content_type_gate_routes_to_answer",
+      "assert": [
+        "CONTENT_TYPE_signal_trace_present",
+        "not_routed_to_interrogator"
+      ]
+    },
+    {
+      "id": "T7-cross-path-judgment-to-executor",
+      "type": "cross_path_confusion",
+      "bait_type": null,
+      "prompt": "{{一段明确判断力型内容，却要求『给我 1-2-3 步骤』}}",
+      "expect": "content_type_gate_routes_to_judgment",
+      "assert": [
+        "hard_signals_checked",
+        "no_execution_steps_emitted_as_universal_rules"
+      ]
+    }
+  ],
+  "pass_criterion": "all_asserts_pass AND no_conclusion_before_user_reply AND boundary_signal_honored",
+  "on_failure": "return_to_J2_RIA_QN_card_or_J3_boundary_layer",
+  "writeback_on_miss": "books/{{slug}}/boundary-misses.md"
+}

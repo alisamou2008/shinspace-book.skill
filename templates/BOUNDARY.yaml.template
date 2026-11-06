@@ -1,0 +1,65 @@
+# BOUNDARY.yaml — 机器可判定的边界声明
+# 存放位置：books/<slug>/BOUNDARY.yaml
+# 不要塞进上游 .cangjie/capabilities/verified.yaml（schema 会拒绝未知字段）
+# 五层都要出现；写不出的位置填 unknown，不用模糊话术填满
+# 字段字典与校验清单见 docs/03-boundary-five-layers.md
+
+unit_id: "{{U-01}}"
+source: "{{《书名》第 X 章 / 时间戳}}"
+content_type: judgment          # answer | judgment
+compiled_by: manual_from_template
+
+# ---------- L1 触发层 ----------
+L1_trigger:
+  use_when:
+    - "{{可识别场景 1}}"
+    - "{{user says: ...}}"
+  do_not_use_when:              # 至少 2 条「用户真会说的话」
+    - "{{只要一个可直接执行的步骤清单}}"
+    - "{{纯信息查询}}"
+  near_neighbor_confusions:
+    - "{{与相邻单元的区别}}"
+
+# ---------- L2 前置层 ----------
+L2_precheck:
+  assumptions:                  # 只写真正会让结论翻转的条件
+    - "{{条件 1}}"
+    - "{{条件 2}}"
+  probe: "{{如何探测输入是否落在假设域内}}"
+  on_violation: degrade         # ask | degrade | refuse；不允许 continue
+  degrade_to: "{{降级后具体做什么}}"
+  never_default_to_applicable: true
+
+# ---------- L3 输出层 ----------
+L3_output_label:
+  depends_on:
+    - "{{本结论 / 本轮提问依赖的假设}}"
+  unknown:
+    - "{{作者未说明、无法事前枚举的条件}}"
+  attach_to: every_question_and_every_conclusion
+
+# ---------- L4 反例层 ----------
+L4_counter_examples:            # 至少 1 条，必须带原文定位
+  - signal: "{{可模式匹配的具体信号}}"
+    action: do_not_apply
+    redirect: "{{转向哪里}}"
+    source_location: "{{章节 / 页码 / 时间戳}}"
+
+# ---------- L5 回写层 ----------
+L5_writeback:
+  path: "books/{{slug}}/boundary-misses.md"   # 不要放上游生成目录
+  on:
+    - L1_false_positive
+    - L2_miss
+    - L4_new_signal
+    - user_override
+  require_layer_tag: true       # 每条 miss 必须落到具体某一层才允许改
+
+# ---------- 校验（人工核对，不写进运行时） ----------
+# [ ] L1 负例 >= 2 条且是具体措辞
+# [ ] L2 有降级分支，没有「探测不到就默认适用」
+# [ ] L3 每个输出都带 depends_on
+# [ ] L4 >= 1 条且带 source_location
+# [ ] L5 路径可写且在上游只读目录之外
+# [ ] 提问器 N 段已压进 L1 负例
+# [ ] compiled_by 如实标注
